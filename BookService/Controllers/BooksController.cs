@@ -18,6 +18,24 @@ namespace BookService.Models
 
         /// <summary>
         /// GET: api/Books
+        /// use DTO
+        /// </summary>
+        /// <returns></returns>
+        public IQueryable<BookDTO> GetBooks()
+        {
+            var books = from b in db.Books
+                        select new BookDTO()
+                        {
+                            Id = b.Id,
+                            Title = b.Title,
+                            AuthorName = b.Author.Name
+                        };
+            return books;
+        }
+
+        /*
+        /// <summary>
+        /// GET: api/Books
         /// Eager loading
         /// </summary>
         /// <returns></returns>
@@ -25,8 +43,41 @@ namespace BookService.Models
         {
             return db.Books.Include(b => b.Author);
         }
+        */
 
-        // GET: api/Books/5
+        /// <summary>
+        /// GET: api/Books
+        /// use DTO
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [ResponseType(typeof(BookDetailDTO))]
+        public async Task<IHttpActionResult> GetBook(int id)
+        {
+            var book = await db.Books.Include(b => b.Author).Select(b =>
+                new BookDetailDTO()
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Year = b.Year,
+                    Price = b.Price,
+                    AuthorName = b.Author.Name,
+                    Genre = b.Genre
+                }).SingleOrDefaultAsync(b => b.Id == id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(book);
+        }
+
+        /*
+        /// <summary>
+        /// // GET: api/Books/5
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [ResponseType(typeof(Book))]
         public async Task<IHttpActionResult> GetBook(int id)
         {
@@ -38,8 +89,14 @@ namespace BookService.Models
 
             return Ok(book);
         }
+        */
 
-        // PUT: api/Books/5
+        /// <summary>
+        /// PUT: api/Books/5
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="book"></param>
+        /// <returns></returns>
         [ResponseType(typeof(void))]
         public async Task<IHttpActionResult> PutBook(int id, Book book)
         {
@@ -74,6 +131,37 @@ namespace BookService.Models
             return StatusCode(HttpStatusCode.NoContent);
         }
 
+        /// <summary>
+        /// POST: api/Books
+        /// use DTO
+        /// </summary>
+        /// <param name="book"></param>
+        /// <returns></returns>
+        public async Task<IHttpActionResult> PostBook(Book book)
+        {
+            if (!ModelState.IsValid)
+	        {
+                return BadRequest(ModelState);
+	        }
+
+            db.Books.Add(book);
+            await db.SaveChangesAsync();
+
+            // New code:
+            // Load author name
+            db.Entry(book).Reference(x => x.Author).Load();
+
+            var dto = new BookDTO()
+            {
+                Id = book.Id,
+                Title = book.Title,
+                AuthorName = book.Author.Name
+            };
+
+            return CreatedAtRoute("DefaultApi", new { id = book.Id }, dto);
+        }
+
+        /*
         // POST: api/Books
         [ResponseType(typeof(Book))]
         public async Task<IHttpActionResult> PostBook(Book book)
@@ -88,6 +176,7 @@ namespace BookService.Models
 
             return CreatedAtRoute("DefaultApi", new { id = book.Id }, book);
         }
+        */
 
         // DELETE: api/Books/5
         [ResponseType(typeof(Book))]
