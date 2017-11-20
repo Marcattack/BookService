@@ -17,6 +17,9 @@ namespace BookService.Models
     
         public BookServiceContext() : base("name=BookServiceContext")
         {
+            // Ajoute un log dans la fenêtre de sortie
+            // pratique pour déboguer
+            this.Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
         }
 
         public System.Data.Entity.DbSet<BookService.Models.Author> Authors { get; set; }

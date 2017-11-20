@@ -16,10 +16,14 @@ namespace BookService.Models
     {
         private BookServiceContext db = new BookServiceContext();
 
-        // GET: api/Books
+        /// <summary>
+        /// GET: api/Books
+        /// Eager loading
+        /// </summary>
+        /// <returns></returns>
         public IQueryable<Book> GetBooks()
         {
-            return db.Books;
+            return db.Books.Include(b => b.Author);
         }
 
         // GET: api/Books/5
