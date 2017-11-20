@@ -6,15 +6,15 @@
     var booksUri = '/api/books/';
 
     function ajaxHelper(uri, method, data) {
-        selft.error(''); // clear error message
+        self.error(''); // clear error message
         return $.ajax({
             type: method,
-            rul: uri,
+            url: uri,
             dataType: 'json',
             contentType: 'application/json',
             data: data ? JSON.stringify(data) : null
         }).fail(function (jqXHR, textStatus, errorThrown) {
-            selft.error(errorThrown);
+            self.error(errorThrown);
         });
     }
 
