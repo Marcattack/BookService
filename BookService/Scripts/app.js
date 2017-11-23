@@ -2,6 +2,7 @@
     var self = this;
     self.books = ko.observableArray();
     self.error = ko.observable();
+    self.detail = ko.observable();
 
     var booksUri = '/api/books/';
 
@@ -21,6 +22,12 @@
     function getAllBooks() {
         ajaxHelper(booksUri, 'GET').done(function (data) {
             self.books(data);
+        });
+    }
+
+    self.getBookDetail = function (item) {
+        ajaxHelper(booksUri + item.Id, 'GET').done(function (data) {
+            self.detail(data);
         });
     }
 
